@@ -1,0 +1,29 @@
+{
+    "name": "poo",
+    "version": "0.0.3",
+    "description": "Post modern oriented objects in Javascript",
+    "main": "./index.js",
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:mvhenten/validate-arguments-js.git"
+    },
+    "keywords": [
+    "class",
+    "klass"
+    ],
+    "dependencies": {
+        "lodash": ">=1.2.1"
+    },
+    "devDependencies": {
+        "mocha": ">=1.9.0",
+        "js-beautify": ">=1.2.0",
+        "jshint": "*"
+    },
+    "scripts": {
+        "test": "./node_modules/mocha/bin/mocha -u tdd -R spec test"
+    },
+    "author": "Matthijs van Henten",
+    "license": "BSD",
+    "readmeFilename": "README.md",
+    "gitHead": "fc61c6fd820cce30ef21688b91203e486db3255f"
+}
