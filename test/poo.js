@@ -26,11 +26,8 @@ suite('poo constructors and tests', function() {
 
     test('Instantiate Poo objects', function() {
         _.times(99, function() {
-            var x = _.random(0, 999),
-                y = _.random(0, 999);
-
-            x = 0;
-
+            var x = _.random(-999, 999),
+                y = _.random(-999, 999);
 
             var p = new Point({
                 x: x,
@@ -90,7 +87,8 @@ suite('poo constructors and tests', function() {
 
     test('With native default value allowed', function() {
         _.times(99, function() {
-            var words = Faker.Lorem.words().join(' ');
+            // words or empty string
+            var words = Faker.Lorem.words().slice(0, _.random(10)).join(' ');
 
             var Thing = Poo.create({
                 name: {
