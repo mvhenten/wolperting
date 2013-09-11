@@ -14,18 +14,18 @@ suite('poo constructors and tests', function() {
         }
     });
 
-    var Line = Poo.create({
-        start: {
-            $isa: Point
-        },
-
-        end: {
-            $isa: Point
-        }
-    });
+    //var Line = Poo.create({
+    //    start: {
+    //        $isa: Point
+    //    },
+    //
+    //    end: {
+    //        $isa: Point
+    //    }
+    //});
 
     test('Instantiate Poo objects', function() {
-        _.times(99, function() {
+        _.times(1, function() {
             var x = _.random(-999, 999),
                 y = _.random(-999, 999);
 
@@ -57,7 +57,7 @@ suite('poo constructors and tests', function() {
     });
 
     test('With native getters allowed', function() {
-        _.times(99, function() {
+        _.times(1, function() {
             var first = Faker.Name.firstName();
             var last = Faker.Name.lastName();
 
@@ -86,7 +86,7 @@ suite('poo constructors and tests', function() {
     });
 
     test('With native default value allowed', function() {
-        _.times(99, function() {
+        _.times(1, function() {
             // words or empty string
             var words = Faker.Lorem.words().slice(0, _.random(10)).join(' ');
 
@@ -105,7 +105,7 @@ suite('poo constructors and tests', function() {
     });
 
     test('With native method allowed', function() {
-        _.times(99, function() {
+        _.times(1, function() {
             var words = Faker.Lorem.words().join(' ');
 
             var Thing = Poo.create({
@@ -124,5 +124,4 @@ suite('poo constructors and tests', function() {
             assert.equal(thing.sayHello(), thing.name + ' says "hello"');
         });
     });
-
 });
