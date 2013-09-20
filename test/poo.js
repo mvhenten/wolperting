@@ -124,4 +124,97 @@ suite('poo constructors and tests', function() {
             assert.equal(thing.sayHello(), thing.name + ' says "hello"');
         });
     });
+
+    test('With custom type isa', function() {
+        _.times(100, function() {
+            var value = _.random(-999, 999);
+
+            var Thing = Poo.create({
+                count: {
+                    $writable: true,
+                    $isa: function(value) {
+                        return (typeof value == 'number') && value > 0;
+                    },
+                }
+            });
+
+            var thing = new Thing();
+
+            if (value < 0) {
+                assert.throws(function() {
+
+                    thing.count = value;
+                }, /TypeError: TypeConstraint Failed: value for count is not a/);
+            } else {
+                thing.count = value;
+                assert.equal(thing.count, value);
+
+            }
+
+
+        });
+    });
+
+    test('With Poo type enum', function() {
+        _.times(100, function() {
+            var value = _.random(-10, 10),
+                values = [1, 2, 3];
+
+            var Thing = Poo.create({
+                count: {
+                    $writable: true,
+                    $isa: Poo.Type.Enum(values)
+                }
+            });
+
+            var thing = new Thing();
+
+            if (values.indexOf(value) === -1) {
+                assert.throws(function() {
+                    thing.count = value;
+                }, /TypeError: TypeConstraint Failed: value for count is not a/);
+            } else {
+                thing.count = value;
+                assert.equal(thing.count, value);
+
+            }
+
+
+        });
+    });
+
+    test('Poo extends plain js', function() {
+        var Parent = function(args) {
+            this._thing = args;
+        }
+
+        Parent.prototype = Object.create({}, {
+            thing: {
+                get: function() {
+                    return this._thing;
+                }
+            }
+        });
+
+        var Child = Poo.extend(Parent, {
+            name: {
+                $isa: String
+            }
+        });
+
+
+        _.times(1, function() {
+            var words = Faker.Lorem.words().join(' '),
+                args = {
+                    name: words
+                };
+
+            var parent = new Parent(args),
+                child = new Child(args);
+
+            assert.deepEqual(parent.thing, args);
+            assert.deepEqual(child.thing, args);
+        });
+    });
+
 });
