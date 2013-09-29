@@ -1,0 +1,17 @@
+{
+    "node": true,
+    "jquery": true,
+    "nonstandard": true,
+    "quotmark": "single",
+    "undef": true,
+    "unused": true,
+    "strict": true,
+    "esnext": true,
+    "globals": {
+        "test": true,
+        "suite": true,
+        "setup": true,
+	"teardown": true
+    }
+
+}

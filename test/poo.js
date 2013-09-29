@@ -1,3 +1,5 @@
+'use strict';
+
 var assert = require('assert'),
     _ = require('lodash'),
     Faker = require('Faker'),
@@ -14,18 +16,51 @@ suite('poo constructors and tests', function() {
         }
     });
 
-    //var Line = Poo.create({
-    //    start: {
-    //        $isa: Point
-    //    },
-    //
-    //    end: {
-    //        $isa: Point
-    //    }
-    //});
+    return;
+
+    test('With lazy build', function() {
+        var Circle = Poo.create({
+            center: {
+                $isa: Point
+            },
+
+            radius: {
+                $isa: function() {
+                    return true;
+                }
+            },
+
+            circumference: {
+                $writable: false,
+                $lazy: function() {
+                    return (2 * this.radius) * Math.PI;
+                }
+            }
+        });
+
+        var x = _.random(-999, 999),
+            y = _.random(-999, 999),
+            r = _.random(1, 999);
+
+        var p = new Point({
+            x: x,
+            y: y
+        });
+
+        console.log(p instanceof Function, 'p instanceof function');
+
+        var circle = new Circle({
+            center: p,
+            radius: r
+        });
+
+
+    });
+
+    return;
 
     test('Instantiate Poo objects', function() {
-        _.times(1, function() {
+        _.times(100, function() {
             var x = _.random(-999, 999),
                 y = _.random(-999, 999);
 
@@ -57,7 +92,7 @@ suite('poo constructors and tests', function() {
     });
 
     test('With native getters allowed', function() {
-        _.times(1, function() {
+        _.times(100, function() {
             var first = Faker.Name.firstName();
             var last = Faker.Name.lastName();
 
@@ -86,7 +121,7 @@ suite('poo constructors and tests', function() {
     });
 
     test('With native default value allowed', function() {
-        _.times(1, function() {
+        _.times(100, function() {
             // words or empty string
             var words = Faker.Lorem.words().slice(0, _.random(10)).join(' ');
 
@@ -105,7 +140,7 @@ suite('poo constructors and tests', function() {
     });
 
     test('With native method allowed', function() {
-        _.times(1, function() {
+        _.times(100, function() {
             var words = Faker.Lorem.words().join(' ');
 
             var Thing = Poo.create({
@@ -133,7 +168,7 @@ suite('poo constructors and tests', function() {
                 count: {
                     $writable: true,
                     $isa: function(value) {
-                        return (typeof value == 'number') && value > 0;
+                        return (typeof value == 'number') && value >= 0;
                     },
                 }
             });
@@ -176,10 +211,7 @@ suite('poo constructors and tests', function() {
             } else {
                 thing.count = value;
                 assert.equal(thing.count, value);
-
             }
-
-
         });
     });
 
@@ -203,7 +235,39 @@ suite('poo constructors and tests', function() {
         });
 
 
-        _.times(1, function() {
+        _.times(100, function() {
+            var words = Faker.Lorem.words().join(' '),
+                args = {
+                    name: words
+                };
+
+            var parent = new Parent(args),
+                child = new Child(args);
+
+            assert.deepEqual(parent.thing, args);
+            assert.deepEqual(child.thing, args);
+        });
+    });
+
+    test('Poo extends plain js vanilla', function() {
+        var Parent = function(args) {
+            this._thing = args;
+        }
+
+        Parent.prototype = {
+            get thing() {
+                return this._thing;
+            }
+        };
+
+        var Child = Poo.extend(Parent, {
+            name: {
+                $isa: String
+            }
+        });
+
+
+        _.times(1000, function() {
             var words = Faker.Lorem.words().join(' '),
                 args = {
                     name: words
