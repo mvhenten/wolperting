@@ -70,6 +70,30 @@ suite('poo constructors and tests', function() {
 
         var cases = [
             {
+                label: 'Float is ok for random integers',
+                type: Types.Float,
+                value: _.random(0, 999),
+                throws: false
+            },
+            {
+                label: 'Float is ok for random floats',
+                type: Types.Float,
+                value: _.random(1, 999) / 10,
+                throws: false
+            },
+            {
+                label: 'Float is ok for zero',
+                type: Types.Float,
+                value: 0,
+                throws: false
+            },
+            {
+                label: 'Float is not ok for NaN',
+                type: Types.Float,
+                value: NaN,
+                throws: /number: NaN/
+            },
+            {
                 label: 'Enum only allowed one of the values provided',
                 type: Types.Enum.apply(null, words),
                 value: _.shuffle(words)[0],
@@ -85,7 +109,7 @@ suite('poo constructors and tests', function() {
                 label: 'Enum allows only enumerated values',
                 type: Types.Enum(words),
                 value: 'not a lorem ipsum',
-                throws: true
+                throws: /TypeError: Value not a lorem ipsum is not one of/
             }
         ];
 
@@ -96,14 +120,12 @@ suite('poo constructors and tests', function() {
                 assert.throws(function() {
                     testCase.type.isa(testCase.value);
                 },
-                    /TypeError: Value not a lorem ipsum is not one of/,
+                    testCase.throws,
                     testCase.label);
                 return;
             }
 
             assert.ok(testCase.type.isa(testCase.value), testCase.label);
-
-
         });
 
     })
