@@ -2,6 +2,7 @@
 
 var assert = require('assert'),
     _ = require('lodash'),
+    util = require('util'),
     Faker = require('Faker'),
     Poo = require('../');
 
@@ -15,49 +16,6 @@ suite('poo constructors and tests', function() {
             $isa: Number
         }
     });
-
-    return;
-
-    test('With lazy build', function() {
-        var Circle = Poo.create({
-            center: {
-                $isa: Point
-            },
-
-            radius: {
-                $isa: function() {
-                    return true;
-                }
-            },
-
-            circumference: {
-                $writable: false,
-                $lazy: function() {
-                    return (2 * this.radius) * Math.PI;
-                }
-            }
-        });
-
-        var x = _.random(-999, 999),
-            y = _.random(-999, 999),
-            r = _.random(1, 999);
-
-        var p = new Point({
-            x: x,
-            y: y
-        });
-
-        console.log(p instanceof Function, 'p instanceof function');
-
-        var circle = new Circle({
-            center: p,
-            radius: r
-        });
-
-
-    });
-
-    return;
 
     test('Instantiate Poo objects', function() {
         _.times(100, function() {
@@ -86,9 +44,75 @@ suite('poo constructors and tests', function() {
                     x: Faker.Lorem.words(),
                     y: y
                 });
-            }, /TypeError: TypeConstraint Failed: value for x is not a/);
+            }, /TypeError: TypeConstraint Failed: /);
 
         });
+    });
+
+    test('With custom type isa', function() {
+        _.times(100, function() {
+            var value = _.random(-999, 999);
+
+            var Thing = Poo.create({
+                count: {
+                    $writable: true,
+                    $isa: Poo.Type(function(value) {
+                        return (typeof value == 'number') && value >= 0;
+                    }),
+                }
+            });
+
+            var thing = new Thing();
+
+            if (value < 0) {
+                assert.throws(function() {
+
+                    thing.count = value;
+                }, /TypeError: TypeConstraint Failed: value for count is not a/);
+            } else {
+                thing.count = value;
+                assert.equal(thing.count, value);
+
+            }
+        });
+    });
+
+
+    test('With lazy build', function() {
+        var Circle = Poo.create({
+            center: {
+                $isa: Point
+            },
+
+            radius: {
+                $isa: Poo.Type(function() {
+                    return true;
+                })
+            },
+
+            circumference: {
+                $writable: false,
+                $lazy: function() {
+                    return (2 * this.radius) * Math.PI;
+                }
+            }
+        });
+
+        var x = _.random(-999, 999),
+            y = _.random(-999, 999),
+            r = _.random(1, 999);
+
+        var p = new Point({
+            x: x,
+            y: y
+        });
+
+        var circle = new Circle({
+            center: p,
+            radius: r
+        });
+
+
     });
 
     test('With native getters allowed', function() {
@@ -160,36 +184,6 @@ suite('poo constructors and tests', function() {
         });
     });
 
-    test('With custom type isa', function() {
-        _.times(100, function() {
-            var value = _.random(-999, 999);
-
-            var Thing = Poo.create({
-                count: {
-                    $writable: true,
-                    $isa: function(value) {
-                        return (typeof value == 'number') && value >= 0;
-                    },
-                }
-            });
-
-            var thing = new Thing();
-
-            if (value < 0) {
-                assert.throws(function() {
-
-                    thing.count = value;
-                }, /TypeError: TypeConstraint Failed: value for count is not a/);
-            } else {
-                thing.count = value;
-                assert.equal(thing.count, value);
-
-            }
-
-
-        });
-    });
-
     test('With Poo type enum', function() {
         _.times(100, function() {
             var value = _.random(-10, 10),
@@ -198,7 +192,7 @@ suite('poo constructors and tests', function() {
             var Thing = Poo.create({
                 count: {
                     $writable: true,
-                    $isa: Poo.Type.Enum(values)
+                    $isa: Poo.Types.Enum(values)
                 }
             });
 
@@ -207,7 +201,7 @@ suite('poo constructors and tests', function() {
             if (values.indexOf(value) === -1) {
                 assert.throws(function() {
                     thing.count = value;
-                }, /TypeError: TypeConstraint Failed: value for count is not a/);
+                }, /TypeError: Value [-]?\d+ is not one of/);
             } else {
                 thing.count = value;
                 assert.equal(thing.count, value);
@@ -280,5 +274,4 @@ suite('poo constructors and tests', function() {
             assert.deepEqual(child.thing, args);
         });
     });
-
 });

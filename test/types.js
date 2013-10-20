@@ -110,6 +110,24 @@ suite('poo constructors and tests', function() {
                 type: Types.Enum(words),
                 value: 'not a lorem ipsum',
                 throws: /TypeError: Value not a lorem ipsum is not one of/
+            },
+            {
+                label: 'Regexp tests for matches',
+                type: Types.RegExp(/\d+/),
+                value: _.random(999),
+                throws: false
+            },
+            {
+                label: 'Regexp tests for matches',
+                type: Types.RegExp(/\d+/),
+                value: Faker.Lorem.words(),
+                throws: /TypeError/
+            },
+            {
+                label: 'Regexp checks for scalar values',
+                type: Types.RegExp(/\w+/),
+                value: Faker.Lorem.words(),
+                throws: /does not match: /
             }
         ];
 
@@ -127,7 +145,116 @@ suite('poo constructors and tests', function() {
 
             assert.ok(testCase.type.isa(testCase.value), testCase.label);
         });
-
     })
 
+    test('Types.Tuple behave like expected', function() {
+        var cases = [
+            {
+                label: 'Tuple is ok',
+                tuple: Types.Tuple(Number, String),
+                value: [_.random(99), Faker.Lorem.sentence()]
+            },
+            {
+                label: 'Tuple length',
+                tuple: Types.Tuple(Number, String),
+                value: [],
+                throws: /Wrong length for tuple/
+            },
+            {
+                label: 'Tuple types',
+                tuple: Types.Tuple(Number, String),
+                value: [_.random(99), _.random(99)],
+                throws: /TypeError/
+            },
+            {
+                label: 'Tuple types in the right order',
+                tuple: Types.Tuple(Number, String),
+                value: [Faker.Lorem.sentence(), _.random(99)],
+                throws: /TypeError/
+            },
+            {
+                label: 'Tuple types nested',
+                tuple: Types.Tuple(Types.Tuple(Number, Number), String),
+                value: [[1, 2], Faker.Lorem.sentence()],
+            },
+            {
+                label: 'Tuple types nested are checked',
+                tuple: Types.Tuple(Types.Tuple(Number, Number), String),
+                value: [[], Faker.Lorem.sentence()],
+                throws: /Wrong length for tuple/
+            }
+        ];
+
+        cases.forEach(function(testCase) {
+            if (testCase.throws) {
+                assert.throws(function() {
+                    testCase.tuple.isa(testCase.value);
+                }, testCase.throws, testCase.label);
+                return;
+            }
+            assert.ok(testCase.tuple.isa(testCase.value), testCase.label);
+        });
+
+    });
+
+
+    test('Types.Native behave like expected', function() {
+        var Instance = function() {
+            this.stuff = Faker.Lorem.words()
+        };
+
+        var cases = [
+            {
+                error: 'value for thing is not a Number',
+                type: Number,
+                ok: _.random(0, 99),
+                fail: Faker.Lorem.sentence()
+            },
+            {
+                error: 'value for thing is not a Object',
+                type: Object,
+                ok: {},
+                fail: Faker.Lorem.sentence()
+            },
+            {
+                error: 'value for thing is not a Date',
+                type: Date,
+                ok: new Date(),
+                fail: Faker.Lorem.sentence()
+            },
+            {
+                error: 'value for thing is not a String',
+                type: String,
+                ok: Faker.Lorem.sentence(),
+                fail: _.random(0, 999)
+            },
+            {
+                error: 'value for thing is not a Boolean',
+                type: Boolean,
+                ok: _.random(0, 1) ? true : false,
+                fail: _.random(0, 999)
+            },
+            {
+                error: 'value for thing is not a Function',
+                type: Function,
+                ok: function() {},
+                fail: _.random(0, 999)
+            },
+            {
+                error: 'not an instanceof',
+                type: Instance,
+                ok: new Instance(),
+                fail: _.random(0, 999)
+            },
+        ];
+
+        cases.forEach(function(testCase) {
+            var type = Types.Native(testCase.type);
+            assert.ok(type.isa(testCase.ok));
+
+            assert.throws(function() {
+                type.isa(testCase.fail, 'thing')
+            }, new RegExp(testCase.error));
+        });
+    });
 });
