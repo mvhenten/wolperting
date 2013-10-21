@@ -274,4 +274,16 @@ suite('Wolperting constructors and tests', function() {
             assert.deepEqual(child.thing, args);
         });
     });
+
+    test('Wolperting handles simple declarations', function() {
+        var Any = Wolperting.create({
+            any: null
+        });
+
+        var a = new Any({
+            any: 42
+        });
+
+        assert.equal(a.any, 42);
+    });
 });
