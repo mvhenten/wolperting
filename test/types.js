@@ -6,7 +6,7 @@ var assert = require('assert'),
     Types = require('../').Types;
 
 
-suite('poo constructors and tests', function() {
+suite('Types constructors and tests', function() {
     test('Types.Type is a constructor', function() {
         var type = Types.Type(function(value) {
             return value;

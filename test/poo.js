@@ -4,11 +4,11 @@ var assert = require('assert'),
     _ = require('lodash'),
     util = require('util'),
     Faker = require('Faker'),
-    Poo = require('../');
+    Wolperting = require('../');
 
 
-suite('poo constructors and tests', function() {
-    var Point = Poo.create({
+suite('Wolperting constructors and tests', function() {
+    var Point = Wolperting.create({
         x: {
             $isa: Number,
         },
@@ -17,7 +17,7 @@ suite('poo constructors and tests', function() {
         }
     });
 
-    test('Instantiate Poo objects', function() {
+    test('Instantiate Wolperting objects', function() {
         _.times(100, function() {
             var x = _.random(-999, 999),
                 y = _.random(-999, 999);
@@ -53,10 +53,10 @@ suite('poo constructors and tests', function() {
         _.times(100, function() {
             var value = _.random(-999, 999);
 
-            var Thing = Poo.create({
+            var Thing = Wolperting.create({
                 count: {
                     $writable: true,
-                    $isa: Poo.Type(function(value) {
+                    $isa: Wolperting.Type(function(value) {
                         return (typeof value == 'number') && value >= 0;
                     }),
                 }
@@ -79,13 +79,13 @@ suite('poo constructors and tests', function() {
 
 
     test('With lazy build', function() {
-        var Circle = Poo.create({
+        var Circle = Wolperting.create({
             center: {
                 $isa: Point
             },
 
             radius: {
-                $isa: Poo.Type(function() {
+                $isa: Wolperting.Type(function() {
                     return true;
                 })
             },
@@ -120,7 +120,7 @@ suite('poo constructors and tests', function() {
             var first = Faker.Name.firstName();
             var last = Faker.Name.lastName();
 
-            var Person = Poo.create({
+            var Person = Wolperting.create({
                 first: {
                     $isa: String
                 },
@@ -149,7 +149,7 @@ suite('poo constructors and tests', function() {
             // words or empty string
             var words = Faker.Lorem.words().slice(0, _.random(10)).join(' ');
 
-            var Thing = Poo.create({
+            var Thing = Wolperting.create({
                 name: {
                     $isa: String,
                     value: words
@@ -167,7 +167,7 @@ suite('poo constructors and tests', function() {
         _.times(100, function() {
             var words = Faker.Lorem.words().join(' ');
 
-            var Thing = Poo.create({
+            var Thing = Wolperting.create({
                 name: {
                     $isa: String,
                     value: words
@@ -184,15 +184,15 @@ suite('poo constructors and tests', function() {
         });
     });
 
-    test('With Poo type enum', function() {
+    test('With Wolperting type enum', function() {
         _.times(100, function() {
             var value = _.random(-10, 10),
                 values = [1, 2, 3];
 
-            var Thing = Poo.create({
+            var Thing = Wolperting.create({
                 count: {
                     $writable: true,
-                    $isa: Poo.Types.Enum(values)
+                    $isa: Wolperting.Types.Enum(values)
                 }
             });
 
@@ -209,7 +209,7 @@ suite('poo constructors and tests', function() {
         });
     });
 
-    test('Poo extends plain js', function() {
+    test('Wolperting extends plain js', function() {
         var Parent = function(args) {
             this._thing = args;
         }
@@ -222,7 +222,7 @@ suite('poo constructors and tests', function() {
             }
         });
 
-        var Child = Poo.extend(Parent, {
+        var Child = Wolperting.extend(Parent, {
             name: {
                 $isa: String
             }
@@ -243,7 +243,7 @@ suite('poo constructors and tests', function() {
         });
     });
 
-    test('Poo extends plain js vanilla', function() {
+    test('Wolperting extends plain js vanilla', function() {
         var Parent = function(args) {
             this._thing = args;
         }
@@ -254,7 +254,7 @@ suite('poo constructors and tests', function() {
             }
         };
 
-        var Child = Poo.extend(Parent, {
+        var Child = Wolperting.extend(Parent, {
             name: {
                 $isa: String
             }

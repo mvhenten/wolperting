@@ -1,1 +1,1 @@
-module.exports = require('./lib/poo');
+module.exports = require('./lib/wolperting');
