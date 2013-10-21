@@ -16,8 +16,8 @@ suite('poo constructors and tests', function() {
         assert.ok(type.isa(true), true, 'isa returns true');
 
         assert.throws(function() {
-            type.isa(false);
-        },
+                type.isa(false);
+            },
             /not a Anonymous Type/);
     });
 
@@ -46,8 +46,8 @@ suite('poo constructors and tests', function() {
         assert.ok(type.isa(true), true, 'isa returns true');
 
         assert.throws(function() {
-            type.isa(false);
-        },
+                type.isa(false);
+            },
             /not a Foo/);
     });
 
@@ -60,8 +60,8 @@ suite('poo constructors and tests', function() {
         assert.ok(type.isa(true), true, 'isa returns true');
 
         assert.throws(function() {
-            type.isa('Not the expected value for Foo');
-        },
+                type.isa('Not the expected value for Foo');
+            },
             /Not the expected value for Foo/);
     });
 
@@ -91,7 +91,7 @@ suite('poo constructors and tests', function() {
                 label: 'Float is not ok for NaN',
                 type: Types.Float,
                 value: NaN,
-                throws: /number: NaN/
+                throws: /TypeError: TypeConstraint Failed: value for .+ is not a Float/
             },
             {
                 label: 'Enum only allowed one of the values provided',
@@ -121,7 +121,7 @@ suite('poo constructors and tests', function() {
                 label: 'Regexp tests for matches',
                 type: Types.RegExp(/\d+/),
                 value: Faker.Lorem.words(),
-                throws: /TypeError/
+                throws: /TypeError: Value .+ does not match: \/\\d[+]\//
             },
             {
                 label: 'Regexp checks for scalar values',
@@ -136,8 +136,8 @@ suite('poo constructors and tests', function() {
 
             if (testCase.throws) {
                 assert.throws(function() {
-                    testCase.type.isa(testCase.value);
-                },
+                        testCase.type.isa(testCase.value);
+                    },
                     testCase.throws,
                     testCase.label);
                 return;
@@ -145,7 +145,7 @@ suite('poo constructors and tests', function() {
 
             assert.ok(testCase.type.isa(testCase.value), testCase.label);
         });
-    })
+    });
 
     test('Types.Tuple behave like expected', function() {
         var cases = [
@@ -200,7 +200,7 @@ suite('poo constructors and tests', function() {
 
     test('Types.Native behave like expected', function() {
         var Instance = function() {
-            this.stuff = Faker.Lorem.words()
+            this.stuff = Faker.Lorem.words();
         };
 
         var cases = [
@@ -253,7 +253,7 @@ suite('poo constructors and tests', function() {
             assert.ok(type.isa(testCase.ok));
 
             assert.throws(function() {
-                type.isa(testCase.fail, 'thing')
+                type.isa(testCase.fail, 'thing');
             }, new RegExp(testCase.error));
         });
     });
