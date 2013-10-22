@@ -426,6 +426,15 @@ suite('Wolperting constructors and tests', function() {
         assert.equal(mail.message, 'Welcome Friend');
         assert.equal(mail.subject, 'Welcome');
 
+        var BaseMail = extend(function(message, subject, to) {
+            this.to = to;
+        }, SignupMail);
+
+        var extmail = new BaseMail('Hello World', 'World says hello', 'info@example.com');
+
+        assert.equal(extmail.to, 'info@example.com');
+
+
         mail.send(function(to, email) {
             assert.equal(to, 'info@example.com');
             assert.deepEqual(email, mail);
