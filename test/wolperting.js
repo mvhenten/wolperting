@@ -43,7 +43,7 @@ suite('Wolperting constructors and tests', function() {
                     x: Faker.Lorem.words(),
                     y: y
                 });
-                assert.ok( ! p );
+                assert.ok(!p);
             }, /TypeError: TypeConstraint Failed: /);
 
         });
@@ -112,7 +112,7 @@ suite('Wolperting constructors and tests', function() {
             radius: r
         });
 
-        assert.equal( circle.circumference, r*2*Math.PI);
+        assert.equal(circle.circumference, r * 2 * Math.PI);
     });
 
     test('With native getters allowed', function() {
@@ -306,7 +306,7 @@ suite('Wolperting constructors and tests', function() {
                 y: 2
             });
 
-            assert.ok( ! p );
+            assert.ok(!p);
         }, /value for x is not a Number/);
 
         var Circle = create({
@@ -351,5 +351,87 @@ suite('Wolperting constructors and tests', function() {
         assert.throws(function() {
             circle.pointInCircle(5, 5);
         }, /TypeError: 5 not an instanceof function/);
+    });
+
+    test('Example code from the readme: extending point', function() {
+        var extend = Wolperting.extend,
+            Types = Wolperting.Types;
+
+        var Point3D = extend(Point, {
+            z: {
+                $isa: Types.Float // better then "Number" it checks for NaN
+            }
+        });
+
+        var point = new Point3D({
+            x: 1,
+            y: 2,
+            z: 3
+        });
+        assert.equal(point.x, 1);
+        assert.equal(point.y, 2);
+        assert.equal(point.z, 3);
+    });
+
+    test('example code from the readme: extending native js: email', function(done) {
+        var extend = Wolperting.extend,
+            Types = Wolperting.Types;
+
+        var Email = function(message, subject) {
+            this.message = message;
+            this.subject = subject;
+        };
+
+        Email.prototype.send = function(to, done) {
+            // do sending and call done when done...
+            done(to, this);
+        };
+
+        var SignupMail = extend(Email, {
+            subject: {
+                $isa: String
+            },
+
+            message: {
+                $isa: String
+            },
+
+            to: {
+                $isa: Types.RegExp(/[\w._%+-]+@[\w.-]+\.[\w]{2,4}/)
+            },
+
+            send: function(done) {
+                Email.prototype.send.call(this, this.to, done);
+            }
+        });
+
+        // Note that we are putting constructor arguments to the end
+        var mail = new SignupMail('Welcome Friend', 'Welcome', {
+            to: 'info@example.com'
+        });
+
+        assert.throws(function() {
+            var mail = new SignupMail('Welcome Friend', 'Welcome', {
+                to: 'example.com'
+            });
+            assert.ok(!mail);
+        }, /TypeError: Value example.com does not match: /);
+
+        assert.throws(function() {
+            var mail = new SignupMail(null);
+            assert.ok(!mail);
+        }, /TypeError: TypeConstraint Failed: value for message is not a String, it isa: object: null/);
+
+        assert.equal(mail.to, 'info@example.com');
+        assert.equal(mail.message, 'Welcome Friend');
+        assert.equal(mail.subject, 'Welcome');
+
+        mail.send(function(to, email) {
+            assert.equal(to, 'info@example.com');
+            assert.deepEqual(email, mail);
+
+            done();
+        });
+
     });
 });
