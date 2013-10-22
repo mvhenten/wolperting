@@ -2,7 +2,6 @@
 
 var assert = require('assert'),
     _ = require('lodash'),
-    util = require('util'),
     Faker = require('Faker'),
     Wolperting = require('../');
 
@@ -44,6 +43,7 @@ suite('Wolperting constructors and tests', function() {
                     x: Faker.Lorem.words(),
                     y: y
                 });
+                assert.ok( ! p );
             }, /TypeError: TypeConstraint Failed: /);
 
         });
@@ -112,7 +112,7 @@ suite('Wolperting constructors and tests', function() {
             radius: r
         });
 
-
+        assert.equal( circle.circumference, r*2*Math.PI);
     });
 
     test('With native getters allowed', function() {
@@ -212,7 +212,7 @@ suite('Wolperting constructors and tests', function() {
     test('Wolperting extends plain js', function() {
         var Parent = function(args) {
             this._thing = args;
-        }
+        };
 
         Parent.prototype = Object.create({}, {
             thing: {
@@ -246,7 +246,7 @@ suite('Wolperting constructors and tests', function() {
     test('Wolperting extends plain js vanilla', function() {
         var Parent = function(args) {
             this._thing = args;
-        }
+        };
 
         Parent.prototype = {
             get thing() {
@@ -285,5 +285,71 @@ suite('Wolperting constructors and tests', function() {
         });
 
         assert.equal(a.any, 42);
+    });
+
+    test('Example code from the readme: circle and point', function() {
+        var create = Wolperting.create,
+            Types = Wolperting.Types;
+
+        var Point = create({
+            x: {
+                $isa: Number
+            },
+            y: {
+                $isa: Number
+            }
+        });
+
+        assert.throws(function() {
+            var p = new Point({
+                x: 'one',
+                y: 2
+            });
+
+            assert.ok( ! p );
+        }, /value for x is not a Number/);
+
+        var Circle = create({
+            center: {
+                $isa: Point
+            },
+
+            radius: {
+                $isa: Types.PositiveInt,
+                value: 10 // set's the default just like Object.create
+            },
+
+            get circumference() {
+                return (2 * this.radius) * Math.PI;
+            },
+
+            pointInCircle: function(point) {
+                Types.assert(point, Point, 'point'); // TypeError if point isn't a Point
+
+                var dx = point.x - this.center.x,
+                    dy = point.y - this.center.y;
+
+                return (Math.sqrt(dx) - Math.sqrt(dy)) < Math.sqrt(this.radius);
+            }
+        });
+
+        var point = new Point({
+            x: 5,
+            y: 5
+        }),
+            circle = new Circle({
+                center: point
+            });
+
+        assert.equal(circle.radius, 10);
+        assert.equal(circle.circumference, 2 * circle.radius * Math.PI);
+        assert.ok(circle.pointInCircle(new Point({
+            x: 7,
+            y: 7
+        })));
+        // type check asserts valid input
+        assert.throws(function() {
+            circle.pointInCircle(5, 5);
+        }, /TypeError: 5 not an instanceof function/);
     });
 });
