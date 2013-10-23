@@ -116,13 +116,8 @@ suite('Wolperting constructors and tests', function() {
             var last = Faker.Name.lastName();
 
             var Person = Wolperting.create({
-                first: {
-                    $isa: String
-                },
-
-                last: {
-                    $isa: String
-                },
+                first: String,
+                last: String,
 
                 get name() {
                     return [this.last, this.first].join(', ');
