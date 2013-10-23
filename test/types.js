@@ -239,13 +239,7 @@ suite('Types constructors and tests', function() {
                 type: Function,
                 ok: function() {},
                 fail: _.random(0, 999)
-            },
-            {
-                error: 'not an instanceof',
-                type: Instance,
-                ok: new Instance(),
-                fail: _.random(0, 999)
-            },
+            }
         ];
 
         cases.forEach(function(testCase) {
