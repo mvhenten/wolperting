@@ -8,12 +8,8 @@ var assert = require('assert'),
 
 suite('Wolperting constructors and tests', function() {
     var Point = Wolperting.create({
-        x: {
-            $isa: Number,
-        },
-        y: {
-            $isa: Number
-        }
+        x: Wolperting.Types.Int,
+        y: Number
     });
 
     test('Instantiate Wolperting objects', function() {
@@ -80,9 +76,7 @@ suite('Wolperting constructors and tests', function() {
 
     test('With lazy build', function() {
         var Circle = Wolperting.create({
-            center: {
-                $isa: Point
-            },
+            center: Point,
 
             radius: {
                 $isa: Wolperting.Type(function() {
