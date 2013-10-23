@@ -91,6 +91,7 @@ suite('Wolperting constructors and tests', function() {
             },
 
             circumference: {
+                $isa: Number,
                 $writable: false,
                 $lazy: function() {
                     return (2 * this.radius) * Math.PI;
