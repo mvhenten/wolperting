@@ -485,7 +485,7 @@ suite('Wolperting constructors and tests', function() {
                 label: 'Simple function attributes become read-only properties no sugar',
                 proto: {
                     method: function() {
-                        return 1;
+                        return n;
                     }
                 },
                 args: {
@@ -495,12 +495,68 @@ suite('Wolperting constructors and tests', function() {
                     }
                 },
                 methods: {
-                    method: 1
+                    method: n
                 },
                 readonly: {
                     method: function() {}
                 }
-            }
+            },
+            {
+                label: 'Type attributes become read-only properties with sugar',
+                proto: {
+                    one: Types.Int
+                },
+                attrs: {
+                    one: n
+                },
+                args: {
+                    ok: {
+                        one: n
+                    },
+                    throws: {
+                        one: Faker.Lorem.sentence()
+                    }
+                },
+                readonly: {
+                    one: _.random(99)
+                }
+            },
+            {
+                label: 'One bag to throw it all in',
+                proto: {
+                    one: n,
+                    two: Number,
+                    three: Types.Int,
+                    method: function() {
+                        return n;
+                    }
+                },
+                attrs: {
+                    one: n,
+                    two: n,
+                    three: n
+                },
+                args: {
+                    ok: {
+                        two: n,
+                        three: n
+                    },
+                    throws: {
+                        one: n,
+                        three: Faker.Lorem.sentence(),
+                        two: Faker.Lorem.sentence(),
+                        method: _.random(99)
+                    }
+                },
+                readonly: {
+                    two: _.random(99),
+                    three: _.random(99),
+                    method: function() {}
+                },
+                methods: {
+                    method: n
+                },
+            },
         ];
 
         var _testIfConstructorThrows = function(testCase) {
@@ -510,6 +566,7 @@ suite('Wolperting constructors and tests', function() {
 
             assert.throws(function() {
                 var instance = new Class(testCase.args.throws);
+                assert.equal(instance, null);
             }, /TypeError/, 'cannot instantiate this class with: ' + testCase.args.throws);
         };
 
@@ -523,7 +580,6 @@ suite('Wolperting constructors and tests', function() {
                     instance[key] = value;
                 });
             });
-            assert.equal( instance, null );
         };
 
         var _testIfAttrsAreReadable = function(testCase) {
