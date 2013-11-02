@@ -424,12 +424,133 @@ suite('Wolperting constructors and tests', function() {
 
         assert.equal(extmail.to, 'info@example.com');
 
-
         mail.send(function(to, email) {
             assert.equal(to, 'info@example.com');
             assert.deepEqual(email, mail);
 
             done();
+        });
+
+    });
+
+    test('various type of attribute defenitions', function() {
+        // when defining a simple value attribute,
+        // it becomes locked
+
+        var create = Wolperting.create,
+            Types = Wolperting.Types;
+
+        var n = _.random(99);
+
+        var cases = [
+            {
+                label: 'Simple value attributes become read-only properties no sugar',
+                proto: {
+                    one: n
+                },
+                attrs: {
+                    one: n
+                },
+                args: {
+                    ok: undefined,
+                    throws: {
+                        one: n + 1
+                    }
+                },
+                readonly: {
+                    one: n
+                }
+            },
+            {
+                label: 'Primitive attributes become read-only properties with sugar',
+                proto: {
+                    one: Number
+                },
+                attrs: {
+                    one: n
+                },
+                args: {
+                    ok: {
+                        one: n
+                    },
+                    throws: {
+                        one: Faker.Lorem.sentence()
+                    }
+                },
+                readonly: {
+                    one: _.random(99)
+                }
+            },
+            {
+                label: 'Simple function attributes become read-only properties no sugar',
+                proto: {
+                    method: function() {
+                        return 1;
+                    }
+                },
+                args: {
+                    ok: undefined,
+                    throws: {
+                        method: _.random(99)
+                    }
+                },
+                methods: {
+                    method: 1
+                },
+                readonly: {
+                    method: function() {}
+                }
+            }
+        ];
+
+        var _testIfConstructorThrows = function(testCase) {
+            if (!testCase.args.throws) return;
+
+            var Class = create(testCase.proto);
+
+            assert.throws(function() {
+                var instance = new Class(testCase.args.throws);
+            }, /TypeError/, 'cannot instantiate this class with: ' + testCase.args.throws);
+        };
+
+        var _testIfAttributesAreImmutable = function(testCase) {
+            var Class = create(testCase.proto);
+
+            var instance = new Class(testCase.args.ok);
+
+            _.each(testCase.readonly, function(value, key) {
+                assert.throws(function() {
+                    instance[key] = value;
+                });
+            });
+            assert.equal( instance, null );
+        };
+
+        var _testIfAttrsAreReadable = function(testCase) {
+            var Class = create(testCase.proto);
+
+            _.each(testCase.attrs, function(value, key) {
+                var instance = new Class(testCase.args.ok);
+                assert.equal(instance[key], value);
+            });
+        };
+
+        var _testIfMethodsAreCallable = function(testCase) {
+            var Class = create(testCase.proto);
+
+            _.each(testCase.methods, function(value, key) {
+                var instance = new Class(testCase.args.ok);
+                assert.equal(instance[key](), value);
+            });
+        };
+
+
+        cases.forEach(function(testCase) {
+            _testIfConstructorThrows(testCase);
+            _testIfAttributesAreImmutable(testCase);
+            _testIfAttrsAreReadable(testCase);
+            _testIfMethodsAreCallable(testCase);
+
         });
 
     });
