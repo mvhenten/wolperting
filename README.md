@@ -74,12 +74,8 @@ However, adding `type annotations` this `Point` class will reveal a more useful
 use case:
 
     var Point = create({
-        x: {
-            $isa: Number
-        },
-        y: {
-            $isa: Number
-        }
+        x: Number,
+        y: Number
     });
 
 
@@ -96,9 +92,7 @@ methods without any additional syntax beyond `Object.defineProperty`.
         Types = require('wolperting').Types;
 
     var Circle = create({
-        center: {
-            $isa: Point
-        },
+        center: Point,
 
         radius: {
             $isa: Types.PositiveInt,
@@ -137,15 +131,12 @@ The above example could be optimized using _memoization_ for "expensive" calcula
 provided by the `$lazy` annotation:
 
     var Circle = create({
-        center: {
-            $isa: Point
-        },
+        center: Point,
 
-        radius: {
-            $isa: Types.PositiveInt
-        },
+        radius: Types.PositiveInt
 
         circumference: {
+            $isa: Number,
             $lazy: function(){
                 return (2 * this.radius) * Math.PI;
             }
@@ -157,9 +148,7 @@ provided by the `$lazy` annotation:
 Wolperting allows you to extend objects in a familiar way:
 
     var Point3D = extend( Point, {
-        z: {
-            $isa: Types.Float // better then "Number" it checks for NaN
-        }
+        z: Types.Float // better then "Number" it checks for NaN
     });
 
     var point = new Point3D({ x: 1, y: 2, z: 3 });
@@ -180,18 +169,12 @@ And extend native javascript classes if desired _(assume done the async test cal
     };
 
     var SignupMail = extend( Email, {
-        subject: {
-            $isa: String
-        },
+        subject: String
 
-        message: {
-            $isa: String
-        },
+        message: String
 
-        to: {
-            // basic regex to check email sanity
-            $isa: Types.RegExp(/[\w._%+-]+@[\w.-]+\.[\w]{2,4}/)
-        },
+        // basic regex to check email sanity
+        to: Types.RegExp(/[\w._%+-]+@[\w.-]+\.[\w]{2,4}/)
 
         send: function(done){
             Email.prototype.send.call( this, this.to, done );
