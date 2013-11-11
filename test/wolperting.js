@@ -78,11 +78,9 @@ suite('Wolperting constructors and tests', function() {
         var Circle = Wolperting.create({
             center: Point,
 
-            radius: {
-                $isa: Wolperting.Type(function() {
-                    return true;
-                })
-            },
+            radius: Wolperting.Type(function() {
+                return true;
+            }),
 
             circumference: {
                 $isa: Number,
@@ -213,11 +211,8 @@ suite('Wolperting constructors and tests', function() {
         });
 
         var Child = Wolperting.extend(Parent, {
-            name: {
-                $isa: String
-            }
+            name: String
         });
-
 
         _.times(100, function() {
             var words = Faker.Lorem.words().join(' '),
@@ -245,9 +240,7 @@ suite('Wolperting constructors and tests', function() {
         };
 
         var Child = Wolperting.extend(Parent, {
-            name: {
-                $isa: String
-            }
+            name: String
         });
 
 
@@ -282,12 +275,8 @@ suite('Wolperting constructors and tests', function() {
             Types = Wolperting.Types;
 
         var Point = create({
-            x: {
-                $isa: Number
-            },
-            y: {
-                $isa: Number
-            }
+            x: Number,
+            y: Number
         });
 
         assert.throws(function() {
@@ -300,9 +289,7 @@ suite('Wolperting constructors and tests', function() {
         }, /value for x is not a Number/);
 
         var Circle = create({
-            center: {
-                $isa: Point
-            },
+            center: Point,
 
             radius: {
                 $isa: Types.PositiveInt,
@@ -348,9 +335,7 @@ suite('Wolperting constructors and tests', function() {
             Types = Wolperting.Types;
 
         var Point3D = extend(Point, {
-            z: {
-                $isa: Types.Float // better then "Number" it checks for NaN
-            }
+            z: Types.Float // better then "Number" it checks for NaN
         });
 
         var point = new Point3D({
@@ -378,17 +363,11 @@ suite('Wolperting constructors and tests', function() {
         };
 
         var SignupMail = extend(Email, {
-            subject: {
-                $isa: String
-            },
+            subject: String,
 
-            message: {
-                $isa: String
-            },
+            message: String,
 
-            to: {
-                $isa: Types.RegExp(/[\w._%+-]+@[\w.-]+\.[\w]{2,4}/)
-            },
+            to: Types.RegExp(/[\w._%+-]+@[\w.-]+\.[\w]{2,4}/),
 
             send: function(done) {
                 Email.prototype.send.call(this, this.to, done);
