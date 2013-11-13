@@ -2,6 +2,7 @@
     "node": true,
     "jquery": true,
     "nonstandard": true,
+    "newcap": false,
     "quotmark": "single",
     "undef": true,
     "unused": true,
