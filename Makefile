@@ -8,6 +8,7 @@ doc/%.html: lib/%.js
 	@./node_modules/dox-docco/bin/dox-docco -i $< -o $@
 
 doc: doc-clean $(DOC)
+	@./node_modules/marked/bin/marked README.md > doc/index.html
 
 doc-clean:
 	@rm -f $(DOC)
