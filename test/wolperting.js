@@ -8,7 +8,7 @@ var assert = require('assert'),
 
 suite('Wolperting constructors and tests', function() {
     var Point = Wolperting.create({
-        x: Wolperting.Types.Int,
+        x: Number,
         y: Number
     });
 
@@ -45,67 +45,26 @@ suite('Wolperting constructors and tests', function() {
         });
     });
 
-    test('With custom type isa', function() {
+
+    test('With native method allowed', function() {
         _.times(100, function() {
-            var value = _.random(-999, 999);
+            var words = Faker.Lorem.words().join(' ');
 
             var Thing = Wolperting.create({
-                count: {
-                    $writable: true,
-                    $isa: Wolperting.Type(function(value) {
-                        return (typeof value == 'number') && value >= 0;
-                    }),
+                name: {
+                    $isa: String,
+                    value: words
+                },
+                sayHello: function() {
+                    return this.name + ' says "hello"';
                 }
             });
 
             var thing = new Thing();
 
-            if (value < 0) {
-                assert.throws(function() {
-
-                    thing.count = value;
-                }, /TypeError: TypeConstraint Failed: value for count is not a/);
-            } else {
-                thing.count = value;
-                assert.equal(thing.count, value);
-
-            }
+            assert.equal(thing.name, words);
+            assert.equal(thing.sayHello(), thing.name + ' says "hello"');
         });
-    });
-
-
-    test('With lazy build', function() {
-        var Circle = Wolperting.create({
-            center: Point,
-
-            radius: Wolperting.Type(function() {
-                return true;
-            }),
-
-            circumference: {
-                $isa: Number,
-                $writable: false,
-                $lazy: function() {
-                    return (2 * this.radius) * Math.PI;
-                }
-            }
-        });
-
-        var x = _.random(-999, 999),
-            y = _.random(-999, 999),
-            r = _.random(1, 999);
-
-        var p = new Point({
-            x: x,
-            y: y
-        });
-
-        var circle = new Circle({
-            center: p,
-            radius: r
-        });
-
-        assert.equal(circle.circumference, r * 2 * Math.PI);
     });
 
     test('With native getters allowed', function() {
@@ -151,51 +110,71 @@ suite('Wolperting constructors and tests', function() {
         });
     });
 
-    test('With native method allowed', function() {
-        _.times(100, function() {
-            var words = Faker.Lorem.words().join(' ');
-
-            var Thing = Wolperting.create({
-                name: {
-                    $isa: String,
-                    value: words
-                },
-                sayHello: function() {
-                    return this.name + ' says "hello"';
-                }
-            });
-
-            var thing = new Thing();
-
-            assert.equal(thing.name, words);
-            assert.equal(thing.sayHello(), thing.name + ' says "hello"');
-        });
-    });
-
-    test('With Wolperting type enum', function() {
-        _.times(100, function() {
-            var value = _.random(-10, 10),
-                values = [1, 2, 3];
+    test('With custom type isa', function() {
+        _.times(1, function() {
+            var value = _.random(-999, 999);
 
             var Thing = Wolperting.create({
                 count: {
                     $writable: true,
-                    $isa: Wolperting.Types.Enum(values)
+                    $isa: function PositiveInt(value) {
+                        return (typeof value == 'number') && value >= 0;
+                    },
                 }
             });
 
             var thing = new Thing();
 
-            if (values.indexOf(value) === -1) {
+            thing.count = 42;
+
+            if (value < 0) {
                 assert.throws(function() {
+
                     thing.count = value;
-                }, /TypeError: Value [-]?\d+ is not one of/);
+                }, /TypeError: TypeConstraint Failed: value for count is not a/);
             } else {
                 thing.count = value;
                 assert.equal(thing.count, value);
             }
         });
     });
+
+
+    test('With lazy build', function() {
+        var Circle = Wolperting.create({
+            center: Point,
+
+            radius: function True() {
+                return true;
+            },
+
+            circumference: {
+                $isa: Number,
+                $writable: false,
+                $lazy: function() {
+                    return (2 * this.radius) * Math.PI;
+                }
+            }
+        });
+
+        var x = _.random(-999, 999),
+            y = _.random(-999, 999),
+            r = _.random(1, 999);
+
+        var p = new Point({
+            x: x,
+            y: y
+        });
+
+        var circle = new Circle({
+            center: p,
+            radius: r
+        });
+
+        assert.equal(circle.circumference, r * 2 * Math.PI);
+    });
+
+
 
     test('Wolperting extends plain js', function() {
         var Parent = function(args) {
@@ -270,6 +249,7 @@ suite('Wolperting constructors and tests', function() {
         assert.equal(a.any, 42);
     });
 
+
     test('Example code from the readme: circle and point', function() {
         var create = Wolperting.create,
             Types = Wolperting.Types;
@@ -327,7 +307,7 @@ suite('Wolperting constructors and tests', function() {
         // type check asserts valid input
         assert.throws(function() {
             circle.pointInCircle(5, 5);
-        }, /TypeError: 5 not an instanceof function/);
+        }, /TypeError: TypeConstraint Failed: 5 not an instanceof/);
     });
 
     test('Example code from the readme: extending point', function() {
@@ -384,7 +364,7 @@ suite('Wolperting constructors and tests', function() {
                 to: 'example.com'
             });
             assert.ok(!mail);
-        }, /TypeError: Value example.com does not match: /);
+        }, /TypeError: TypeConstraint Failed: Value example.com does not match: /);
 
         assert.throws(function() {
             var mail = new SignupMail(null);
@@ -410,6 +390,31 @@ suite('Wolperting constructors and tests', function() {
             done();
         });
 
+    });
+
+    test('With Wolperting type enum', function() {
+        _.times(100, function() {
+            var value = _.random(-10, 10),
+                values = [1, 2, 3];
+
+            var Thing = Wolperting.create({
+                count: {
+                    $writable: true,
+                    $isa: Wolperting.Types.Enum(values)
+                }
+            });
+
+            var thing = new Thing();
+
+            if (values.indexOf(value) === -1) {
+                assert.throws(function() {
+                    thing.count = value;
+                }, /TypeError: TypeConstraint Failed: Value [-]?\d+ is not one of/);
+            } else {
+                thing.count = value;
+                assert.equal(thing.count, value);
+            }
+        });
     });
 
     test('various type of attribute defenitions', function() {

@@ -7,64 +7,6 @@ var assert = require('assert'),
 
 
 suite('Types constructors and tests', function() {
-    test('Types.Type is a constructor', function() {
-        var type = Types.Type(function(value) {
-            return value;
-        });
-
-        assert.ok(type instanceof Types.Type, 'Types.Type is a constructor for Type');
-        assert.ok(type.isa(true), true, 'isa returns true');
-
-        assert.throws(function() {
-                type.isa(false);
-            },
-            /not a Anonymous Type/);
-    });
-
-    test('Types.Type is frozen', function() {
-        var type = Types.Type(function(value) {
-            return value;
-        });
-
-        assert.ok(type.isa(true), true, 'isa returns true');
-
-        assert.throws(function() {
-            type.isa = function() {};
-        }, /Cannot assign/);
-
-        assert.throws(function() {
-            type.foo = function() {};
-        }, /object is not extensible/);
-    });
-
-    test('Types.Type with name', function() {
-        var type = Types.Type('Foo', function(value) {
-            return value;
-        });
-
-        assert.ok(type instanceof Types.Type, 'Types.Type is a constructor for Type');
-        assert.ok(type.isa(true), true, 'isa returns true');
-
-        assert.throws(function() {
-                type.isa(false);
-            },
-            /not a Foo/);
-    });
-
-    test('Types.Type with custom error', function() {
-        var type = Types.Type('Foo', function(value) {
-            return value;
-        });
-
-        assert.ok(type instanceof Types.Type, 'Types.Type is a constructor for Type');
-        assert.ok(type.isa(true), true, 'isa returns true');
-
-        assert.throws(function() {
-                type.isa('Not the expected value for Foo');
-            },
-            /Not the expected value for Foo/);
-    });
-
     test('Types.[types] behave like expected', function() {
         var words = Faker.Lorem.words();
 
@@ -73,130 +15,123 @@ suite('Types constructors and tests', function() {
                 label: 'Float is ok for random integers',
                 type: Types.Float,
                 value: _.random(0, 999),
-                throws: false
+                expect: true
             },
             {
                 label: 'Float is ok for random floats',
                 type: Types.Float,
                 value: _.random(1, 999) / 10,
-                throws: false
+                expect: true
             },
             {
                 label: 'Float is ok for zero',
                 type: Types.Float,
                 value: 0,
-                throws: false
+                expect: true
             },
             {
                 label: 'Float is not ok for NaN',
                 type: Types.Float,
                 value: NaN,
-                throws: /TypeError: TypeConstraint Failed: value for .+ is not a Float/
+                expect: false
             },
             {
                 label: 'Enum only allowed one of the values provided',
-                type: Types.Enum.apply(null, words),
+                type: Types.Enum(words),
                 value: _.shuffle(words)[0],
-                throws: false
+                expect: true
             },
             {
                 label: 'First argument can be an array too',
                 type: Types.Enum(words),
                 value: _.shuffle(words)[0],
-                throws: false
+                expect: true
             },
             {
                 label: 'Enum allows only enumerated values',
                 type: Types.Enum(words),
                 value: 'not a lorem ipsum',
-                throws: /TypeError: Value not a lorem ipsum is not one of/
+                expect: /is not one of: /
             },
             {
                 label: 'Regexp tests for matches',
                 type: Types.RegExp(/\d+/),
                 value: _.random(999),
-                throws: false
+                expect: true
             },
             {
                 label: 'Regexp tests for matches',
                 type: Types.RegExp(/\d+/),
                 value: Faker.Lorem.words(),
-                throws: /TypeError: Value .+ does not match: \/\\d[+]\//
+                expect: /does not match: \/[\\]d+/
             },
             {
                 label: 'Regexp checks for scalar values',
                 type: Types.RegExp(/\w+/),
                 value: Faker.Lorem.words(),
-                throws: /does not match: /
+                expect: /does not match: \/[\\]w+/
             }
         ];
 
         cases.forEach(function(testCase) {
-            assert.ok(testCase.type instanceof Types.Type, testCase.label);
+            var got = testCase.type(testCase.value);
 
-            if (testCase.throws) {
-                assert.throws(function() {
-                        testCase.type.isa(testCase.value);
-                    },
-                    testCase.throws,
-                    testCase.label);
+            if (testCase.expect instanceof RegExp) {
+                assert.ok(testCase.expect.test(got), testCase.label);
                 return;
             }
 
-            assert.ok(testCase.type.isa(testCase.value) || true, testCase.label);
+            assert.equal(got, testCase.expect, testCase.label);
         });
     });
 
     test('Types.Tuple behave like expected', function() {
+        var n = _.random(99),
+            s = Faker.Lorem.sentence();
         var cases = [
             {
                 label: 'Tuple is ok',
-                tuple: Types.Tuple(Number, String),
-                value: [_.random(99), Faker.Lorem.sentence()]
+                type: Types.Tuple(Number, String),
+                value: [_.random(99), Faker.Lorem.sentence()],
+                expect: true
             },
             {
                 label: 'Tuple length',
-                tuple: Types.Tuple(Number, String),
+                type: Types.Tuple(Number, String),
                 value: [],
-                throws: /Wrong length for tuple/
+                expect: 'Expected 2 values, got 0'
             },
             {
-                label: 'Tuple types',
-                tuple: Types.Tuple(Number, String),
-                value: [_.random(99), _.random(99)],
-                throws: /TypeError/
+                label: 'Tuple checks types',
+                type: Types.Tuple(Number, String),
+                value: [_.random(99), n],
+                expect: 'Wrong type in tuple: value for index 1 is not a String, it isa: number: ' + n
             },
             {
                 label: 'Tuple types in the right order',
-                tuple: Types.Tuple(Number, String),
-                value: [Faker.Lorem.sentence(), _.random(99)],
-                throws: /TypeError/
+                type: Types.Tuple(Number, String),
+                value: [s, _.random(99)],
+                expect: 'Wrong type in tuple: value for index 0 is not a Number, it isa: string: ' + s
             },
             {
                 label: 'Tuple types nested',
-                tuple: Types.Tuple(Types.Tuple(Number, Number), String),
+                type: Types.Tuple(Types.Tuple(Number, Number), String),
                 value: [[1, 2], Faker.Lorem.sentence()],
+                expect: true
             },
             {
                 label: 'Tuple types nested are checked',
-                tuple: Types.Tuple(Types.Tuple(Number, Number), String),
+                type: Types.Tuple(Types.Tuple(Number, Number), String),
                 value: [[], Faker.Lorem.sentence()],
-                throws: /Wrong length for tuple/
+                expect: 'Wrong type in tuple: Expected 2 values, got 0'
             }
         ];
 
         cases.forEach(function(testCase) {
-            if (testCase.throws) {
-                assert.throws(function() {
-                    testCase.tuple.isa(testCase.value);
-                }, testCase.throws, testCase.label);
-                return;
-            }
-            assert.ok(testCase.tuple.isa(testCase.value), testCase.label);
+            var got = testCase.type(testCase.value);
+            assert.equal(got, testCase.expect, testCase.label);
         });
-
     });
-
 
     test('Types.Native behave like expected', function() {
 
@@ -241,11 +176,8 @@ suite('Types constructors and tests', function() {
 
         cases.forEach(function(testCase) {
             var type = Types.Native(testCase.type);
-            assert.ok(type.isa(testCase.ok) || true, testCase.error);
 
-            assert.throws(function() {
-                type.isa(testCase.fail, 'thing');
-            }, new RegExp(testCase.error));
+            assert.equal(type(testCase.fail), false);
         });
     });
 });
