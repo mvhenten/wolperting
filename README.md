@@ -2,6 +2,7 @@ Wolperting
 ==========
 ### minimal object-system inspired by the Perl Meta-protocol API
 
+[![Build Status](https://drone.io/github.com/mvhenten/wolperting/status.png)](https://drone.io/github.com/mvhenten/wolperting/latest)
 
 Introduction
 ------------
