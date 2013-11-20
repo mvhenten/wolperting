@@ -19,7 +19,7 @@
         "mocha": ">=1.9.0",
         "js-beautify": ">=1.2.0",
         "jshint": "*",
-        "dox-docco": ">=0.1.0"
+        "jsdox": ">=0.2.2"
     },
     "scripts": {
         "test": "./node_modules/mocha/bin/mocha -u tdd -R spec test"
