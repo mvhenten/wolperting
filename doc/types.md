@@ -277,7 +277,7 @@ order and of the right type. Tuples may be nested, and an efford is made to
 create error messages that make some sense.
 
 Examples:
-
+```javascript
 var type = Types.Tuple( [ Number, Number ]);
 
 console.log( type( [1, 2] ) );
@@ -285,6 +285,8 @@ console.log( type( [1, 2] ) );
 
 console.log( type( ['a', 2] ) );
 // returns something like "Wrong type in type: index 0 is not a..."
+
+````
 
 
 
