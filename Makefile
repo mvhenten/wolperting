@@ -1,14 +1,13 @@
 GIT_MODIFIED_UPDATED = $(shell git status --porcelain | grep -E '.?[AM].+[.]js(on)?$$' | sed -e "s/^...//g")
 
 SRC = $(wildcard lib/*.js)
-DOC = $(SRC:lib/%.js=doc/%.html)
+DOC = $(SRC:lib/%.js=doc/%.md)
 
-doc/%.html: lib/%.js
+doc/%.md: lib/%.js
 	@mkdir -p $(@D)
-	@./node_modules/dox-docco/bin/dox-docco -i $< -o $@
+	@./node_modules/jsdox/bin/jsdox --output doc $<
 
 doc: doc-clean $(DOC)
-	@./node_modules/marked/bin/marked README.md > doc/index.html
 
 doc-clean:
 	@rm -f $(DOC)
