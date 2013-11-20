@@ -11,7 +11,7 @@ a mimal layer between ES5 `Object.create` and `Object.defineProperties`, achievi
 native encapsulation, getters- and setters and protection against un-intended
 behaviour.
 
-The basic API adds no other conventions then those imposed by `Object.create`.
+The basic API adds no other conventions then those introduced by `Object.create`.
 This means that Wolperting knows how to handle ES5 `get` and `set`, however works
 around the limitation of the second argument to `Object.create`.
 
@@ -20,8 +20,8 @@ created by the Wolperting constructor are made __immutable__ after instantiation
 using `Object.freeze`. The constructor populates attributes at instantiation,
 transforming your object's prototype declaration as a de-facto API.
 
-Additionally, it adds a type-checking mechanism that leverages `lodash`'s `isXXX`
-functions, providing a stable fundament for type-checking in javascript.
+Additionally, it provides a number of built-in types providing a stable fundament
+for type-checking in javascript.
 
 Examples
 --------
@@ -88,8 +88,22 @@ use case:
 Wolperting allows you to mix javascript native `get` and plain old functions as
 methods without any additional syntax beyond `Object.defineProperty`.
 
-    var create = require('wolperting').create,
-        Types = require('wolperting').Types;
+    var create = Wolperting.create,
+        Types = Wolperting.Types;
+
+    var Point = create({
+        x: Number,
+        y: Number
+    });
+
+    assert.throws(function() {
+        var p = new Point({
+            x: 'one',
+            y: 2
+        });
+
+        assert.ok(!p);
+    }, /value for x is not a Number/);
 
     var Circle = create({
         center: Point,
@@ -113,17 +127,24 @@ methods without any additional syntax beyond `Object.defineProperty`.
         }
     });
 
-    var point = new Point({ x: 5, y: 5 }),
-        circle = new Circle({ center: point });
+    var point = new Point({
+        x: 5,
+        y: 5
+    }),
+        circle = new Circle({
+            center: point
+        });
 
     assert.equal(circle.radius, 10);
     assert.equal(circle.circumference, 2 * circle.radius * Math.PI);
-    assert.ok(circle.pointInCircle(new Point({ x: 7, y: 7 })));
-
+    assert.ok(circle.pointInCircle(new Point({
+        x: 7,
+        y: 7
+    })));
     // type check asserts valid input
     assert.throws(function() {
         circle.pointInCircle(5, 5);
-    }, /TypeError: 5 not an instanceof function/);
+    }, /TypeError: TypeConstraint Failed: 5 not an instanceof/);
 
 ### The `$lazy` annotation
 
@@ -147,14 +168,21 @@ provided by the `$lazy` annotation:
 
 Wolperting allows you to extend objects in a familiar way:
 
-    var Point3D = extend( Point, {
+    var extend = Wolperting.extend,
+        Types = Wolperting.Types;
+
+    var Point3D = extend(Point, {
         z: Types.Float // better then "Number" it checks for NaN
     });
 
-    var point = new Point3D({ x: 1, y: 2, z: 3 });
-    assert.equal( point.x, 1 );
-    assert.equal( point.y, 2 );
-    assert.equal( point.z, 3 );
+    var point = new Point3D({
+        x: 1,
+        y: 2,
+        z: 3
+    });
+    assert.equal(point.x, 1);
+    assert.equal(point.y, 2);
+    assert.equal(point.z, 3);
 
 And extend native javascript classes if desired _(assume done the async test callback)_
 
