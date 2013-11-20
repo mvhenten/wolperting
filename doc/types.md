@@ -24,9 +24,11 @@ Perform a type check and trows a TypeError if the check fails. Wraps the
 type argument so that we can call `isa`.
 
 Examples:
+```javascript
 
 Types.assert( 'foo', Number, 'thing' );
 // throws: 'TypeError: TypeConstraint Failed: thing is not a Number it is a...'
+```
 
 
 
@@ -305,6 +307,7 @@ regular expression that will be used to validate against.
 
 Examples:
 
+```javascript
 var type = Types.RegExp( /\d+/ );
 
 console.log( type(1) );
@@ -313,6 +316,7 @@ console.log( type(1) );
 console.log( type( '1.34' ) );
 // returns something like "Value 1.34 does not matc: /\d+/"
 
+```
 
 
 **Parameters**

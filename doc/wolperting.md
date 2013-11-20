@@ -5,8 +5,15 @@ class. see [introduction](index.html)
 
 Examples:
 
+```javascript
 var Parent = function(){ console.log('i am parent') }
+
 var Child = Wolperting.extend( Parent, { get name(){  return 'foo' } });
+// parent constructor is called, log 'i am parent'
+var child = new Child();
+child.name // returns 'foo'
+
+```
 
 
 
