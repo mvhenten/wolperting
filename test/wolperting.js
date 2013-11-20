@@ -111,7 +111,7 @@ suite('Wolperting constructors and tests', function() {
     });
 
     test('With custom type isa', function() {
-        _.times(1, function() {
+        _.times(100, function() {
             var value = _.random(-999, 999);
 
             var Thing = Wolperting.create({
@@ -223,7 +223,7 @@ suite('Wolperting constructors and tests', function() {
         });
 
 
-        _.times(1000, function() {
+        _.times(100, function() {
             var words = Faker.Lorem.words().join(' '),
                 args = {
                     name: words
