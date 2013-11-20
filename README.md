@@ -24,6 +24,8 @@ transforming your object's prototype declaration as a de-facto API.
 Additionally, it provides a number of built-in types providing a stable fundament
 for type-checking in javascript.
 
+See (types)[doc/types.md] for more information on type-checks
+
 Examples
 --------
 
