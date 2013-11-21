@@ -71,7 +71,8 @@ by replacing a couple lines of code:
     assert.equal( p.x, 1 );
     assert.equal( p.y, 2 );
 
-If you assign properties null,
+If you assign properties null, no type checking will occur beyond checking that
+the property is actually `defined`.
 
 However, adding `type annotations` this `Point` class will reveal a more useful
 use case:

@@ -12,6 +12,34 @@ suite('Wolperting constructors and tests', function() {
         y: Number
     });
 
+    test('Example from the readme: point', function() {
+        var Point = Wolperting.create({
+            x: null,
+            y: null
+        });
+
+        var ax = _.random(0, 99),
+            ay = _.random(0, 99),
+            bx = _.random(0, 99),
+            by = _.random(0, 99);
+
+        var a = new Point({
+            x: ax,
+            y: ay
+        });
+        var b = new Point({
+            x: bx,
+            y: by
+        });
+
+        assert.equal(a.x, ax);
+        assert.equal(a.y, ay);
+
+        assert.equal(b.x, bx);
+        assert.equal(b.y, by);
+    });
+
+
     test('Instantiate Wolperting objects', function() {
         _.times(100, function() {
             var x = _.random(-999, 999),
@@ -248,7 +276,6 @@ suite('Wolperting constructors and tests', function() {
 
         assert.equal(a.any, 42);
     });
-
 
     test('Example code from the readme: circle and point', function() {
         var create = Wolperting.create,
