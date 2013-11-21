@@ -37,8 +37,7 @@ by replacing a couple lines of code:
 
 ###### point example in native javascript
 
-    var _ = require('lodash');
-
+ ```javascript
     var Point = function(args){
         // check for x and y possibly...
 
@@ -57,9 +56,11 @@ by replacing a couple lines of code:
     var p = new Point({ x: 1, y: 2 });
     assert.equal( p.x, 1 );
     assert.equal( p.y, 2 );
+```
 
 ###### point example in wolperting
 
+ ```javascript
     var create = require('wolperting').create;
 
     var Point = create({
@@ -70,6 +71,7 @@ by replacing a couple lines of code:
     var p = new Point({ x: 1, y: 2 });
     assert.equal( p.x, 1 );
     assert.equal( p.y, 2 );
+```
 
 If you assign properties null, no type checking will occur beyond checking that
 the property is actually `defined` when trying to set the attribute in the constructor.
@@ -77,21 +79,23 @@ the property is actually `defined` when trying to set the attribute in the const
 However, adding `type annotations` this `Point` class will reveal a more useful
 use case:
 
+ ```javascript
     var Point = create({
         x: Number,
         y: Number
     });
 
-
     assert.throws(function(){
         var p = new Point({ x: 'one', y: 2 });
     }, /value for x is not a Number/);
+```
 
 ### using ES5 `get` and vanilla methods
 
 Wolperting allows you to mix javascript native `get` and plain old functions as
 methods without any additional syntax beyond `Object.defineProperty`.
 
+ ```javascript
     var create = Wolperting.create,
         Types = Wolperting.Types;
 
@@ -133,6 +137,7 @@ methods without any additional syntax beyond `Object.defineProperty`.
     assert.equal(circle.circumference, 2 * circle.radius * Math.PI);
     assert.ok(circle.pointInCircle( 7, 7 ));
     assert.equal(circle.pointInCircle( 70, 70 ), false);
+```
 
 ### Type annotations
 
@@ -141,14 +146,17 @@ a `false` or an error string when the type does not match, or a `true`, `null` o
 
 To distinguish a function as a type annotation, Wolperting assumes that you `name` your function:
 
+ ```javascript
     var Foo = create({
         bar: function Bar(value){
             return /bar/.test(value);
         }
     });
+```
 
 To make the attribute "blob" writable however we need to annotate the attribute using `$writable`:
 
+ ```javascript
     var Foo = create({
         bar: {
             $writable: true,
@@ -165,17 +173,14 @@ To make the attribute "blob" writable however we need to annotate the attribute 
 
     thing.bar = 'a biz is not enough';
     // throws a TyperError
-
-
-
-
-
-
+```
 
 ### The `$lazy` annotation
 
-The above example could be optimized using _memoization_ for "expensive" calculations,
+The above `Circle` example could be optimized using _memoization_ for "expensive" calculations,
 provided by the `$lazy` annotation:
+
+ ```javascript
 
     var Circle = create({
         center: Point,
@@ -190,12 +195,16 @@ provided by the `$lazy` annotation:
         }
     });
 
-In order to provide the `$lazy` annotation, note that we provided a type annotation
+```
+
+In order to provide the `$lazy` annotation, we provided a type annotation
 using the key `$isa`.
 
 ### Extending objects
 
 Wolperting allows you to extend objects in a familiar way:
+
+ ```javascript
 
     var extend = Wolperting.extend,
         Types = Wolperting.Types;
@@ -212,9 +221,11 @@ Wolperting allows you to extend objects in a familiar way:
     assert.equal(point.x, 1);
     assert.equal(point.y, 2);
     assert.equal(point.z, 3);
+```
 
 And extend native javascript classes if desired _(assume done the async test callback)_
 
+ ```javascript
     var Email = function(message, subject ){
         this.message = message;
         this.subject = subject;
@@ -263,8 +274,9 @@ And extend native javascript classes if desired _(assume done the async test cal
 
         done();
     });
+```
 
-Note that we achieved a number things here: first, we hardened our "legacy" code by
+We achieved a number things here: first, we hardened our "legacy" code by
 providing type annotations to our `SignupMail`. The class is frozen after the constructor
 is done, allowing the original `Email` constructor to set our values as usual. We then
 override the original `send` method to provide an adaptor to the legacy interface,
@@ -273,6 +285,7 @@ and added a sanity check for the legacy method to handle our new interface prope
 Extend also allows you to add yet another constructor, in this case, we adapt our
 interface to allow for more sugar, using a custom constructor:
 
+ ```javascript
     var BaseMail = extend(function( message, subject, to ){
         this.to = to;
     }, SignupMail );
@@ -280,6 +293,7 @@ interface to allow for more sugar, using a custom constructor:
     var extmail = new BaseMail('Hello World', 'World says hello', 'info@example.com');
 
     assert.equal( extmail.to, 'info@example.com');
+```
 
-Note that these examples are also included in Wolperting's test suite.
+These examples are also included in Wolperting's test suite.
 
