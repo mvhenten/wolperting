@@ -72,7 +72,7 @@ by replacing a couple lines of code:
     assert.equal( p.y, 2 );
 
 If you assign properties null, no type checking will occur beyond checking that
-the property is actually `defined`.
+the property is actually `defined` when trying to set the attribute in the constructor.
 
 However, adding `type annotations` this `Point` class will reveal a more useful
 use case:
@@ -100,15 +100,6 @@ methods without any additional syntax beyond `Object.defineProperty`.
         y: Number
     });
 
-    assert.throws(function() {
-        var p = new Point({
-            x: 'one',
-            y: 2
-        });
-
-        assert.ok(!p);
-    }, /value for x is not a Number/);
-
     var Circle = create({
         center: Point,
 
@@ -121,11 +112,9 @@ methods without any additional syntax beyond `Object.defineProperty`.
             return (2 * this.radius) * Math.PI;
         },
 
-        pointInCircle: function(point) {
-            Types.assert(point, Point, 'point'); // TypeError if point isn't a Point
-
-            var dx = point.x - this.center.x,
-                dy = point.y - this.center.y;
+        pointInCircle: function(x,y) {
+            var dx = x - this.center.x,
+                dy = y - this.center.y;
 
             return (Math.sqrt(dx) - Math.sqrt(dy)) < Math.sqrt(this.radius);
         }
@@ -134,21 +123,54 @@ methods without any additional syntax beyond `Object.defineProperty`.
     var point = new Point({
         x: 5,
         y: 5
-    }),
-        circle = new Circle({
-            center: point
-        });
+    });
+
+    var circle = new Circle({
+        center: point
+    });
 
     assert.equal(circle.radius, 10);
     assert.equal(circle.circumference, 2 * circle.radius * Math.PI);
-    assert.ok(circle.pointInCircle(new Point({
-        x: 7,
-        y: 7
-    })));
-    // type check asserts valid input
-    assert.throws(function() {
-        circle.pointInCircle(5, 5);
-    }, /TypeError: TypeConstraint Failed: 5 not an instanceof/);
+    assert.ok(circle.pointInCircle( 7, 7 ));
+    assert.equal(circle.pointInCircle( 70, 70 ), false);
+
+### Type annotations
+
+Type annotations are nothing more then a simple function, that should return either
+a `false` or an error string when the type does not match, or a `true`, `null` or `undefined`.
+
+To distinguish a function as a type annotation, Wolperting assumes that you `name` your function:
+
+    var Foo = create({
+        bar: function Bar(value){
+            return /bar/.test(value);
+        }
+    });
+
+To make the attribute "blob" writable however we need to annotate the attribute using `$writable`:
+
+    var Foo = create({
+        bar: {
+            $writable: true,
+            $isa: function Blob(value){
+                return /bar/.test(value);
+            }
+        }
+    });
+
+    var foo = new Foo();
+
+    // ok, it's a bar
+    thing.bar = 'any bar will do';
+
+    thing.bar = 'a biz is not enough';
+    // throws a TyperError
+
+
+
+
+
+
 
 ### The `$lazy` annotation
 
@@ -167,6 +189,9 @@ provided by the `$lazy` annotation:
             }
         }
     });
+
+In order to provide the `$lazy` annotation, note that we provided a type annotation
+using the key `$isa`.
 
 ### Extending objects
 
