@@ -1,5 +1,5 @@
 {
-    "name": "wolperting",
+    "name": "class-wolperting",
     "version": "0.0.3",
     "description": "Post-modern oriented objects in Javascript",
     "main": "./index.js",
