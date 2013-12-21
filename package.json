@@ -5,11 +5,17 @@
     "main": "./index.js",
     "repository": {
         "type": "git",
-        "url": "git@github.com:mvhenten/validate-arguments-js.git"
+        "url": "https://github.com/mvhenten/wolperting"
     },
     "keywords": [
     "class",
-    "klass"
+    "klass",
+    "inheritance",
+    "prototype",
+    "moose",
+    "meta",
+    "object",
+    "object oriented"
   ],
     "dependencies": {
         "lodash": ">=1.2.1"
