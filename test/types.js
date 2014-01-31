@@ -180,4 +180,67 @@ suite('Types constructors and tests', function() {
             assert.equal(type(testCase.fail), false);
         });
     });
+
+    test('Types.DuckType', function() {
+
+        var cases = [
+            {
+                type: {
+                    one: Number
+                },
+                value: {
+                    one: _.random(0, 99)
+                },
+                error: undefined,
+            },
+            {
+                type: {
+                    one: Number
+                },
+                value: {
+                    one: Faker.Lorem.sentence()
+                },
+                error: 'Wrong type in DuckType: value for key one is not a Number, it isa: string:',
+            },
+            {
+                type: {
+                    one: Number,
+                    two: String,
+                    three: function Custom() {
+                        return true;
+                    }
+                },
+                value: {
+                    one: _.random(0, 99),
+                    two: Faker.Lorem.sentence(),
+                    three: null
+                },
+                error: undefined
+            },
+            {
+                type: {
+                    one: Number,
+                    two: String,
+                    three: function Custom() {
+                        return false;
+                    }
+                },
+                value: {
+                    one: _.random(0, 99),
+                    two: Faker.Lorem.sentence(),
+                    three: null
+                },
+                error: 'Wrong type in DuckType: value for key three is not a Custom, it isa: object: null'
+            }
+        ];
+
+        cases.forEach(function(testCase) {
+            var type = Types.DuckType(testCase.type),
+                err = type(testCase.value);
+
+            assert.ok((new RegExp(testCase.error + '')).test('' + err), testCase.label);
+        });
+
+
+    });
 });
