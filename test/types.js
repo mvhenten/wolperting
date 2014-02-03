@@ -7,6 +7,48 @@ var assert = require('assert'),
 
 
 suite('Types constructors and tests', function() {
+    test('Types.Maybe checks type when defined', function() {
+        var cases = [
+            {
+                label: 'null is ok for a maybe',
+                type: String,
+                value: null,
+                expect: true,
+            },
+            {
+                label: 'undefined is ok for a maybe',
+                type: String,
+                value: undefined,
+                expect: true,
+            },
+            {
+                label: 'a string is not a valid number (maybe)',
+                type: Number,
+                value: Faker.Lorem.sentence(),
+                expect: /value for Maybe\[Number\] is not a Number/,
+            },
+            {
+                label: 'tuple types are deeply checked',
+                type: Types.Tuple(Number, Number),
+                value: [1, (22).toString(2)],
+                expect: /Wrong type in tuple: value for index 1 is not a Number/,
+            }
+        ];
+
+        cases.forEach(function(testCase) {
+            var type = Types.Maybe(testCase.type),
+                got = type(testCase.value);
+
+
+            if (testCase.expect instanceof RegExp) {
+                assert.ok(testCase.expect.test(got), testCase.label);
+                return;
+            }
+
+            assert.equal(got, testCase.expect, testCase.label);
+        });
+    });
+
     test('Types.[types] behave like expected', function() {
         var words = Faker.Lorem.words();
 
