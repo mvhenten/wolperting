@@ -300,6 +300,67 @@ console.log( type( ['a', 2] ) );
 
 *Boolean|String*,  ok True if the check is successfull, or an error string
 
+Maybe(type)
+-----------
+Create a Maybe type check. Maybe types must either be null or undefined,
+or a value that passes the supplied `Type` check.
+
+Examples:
+```javascript
+var type = Types.Maybe( Number );
+
+console.log( type(null) );
+// returns true
+
+console.log( type(1) );
+// returns true
+
+console.log( type('1') );
+// returns an error string
+
+````
+
+
+
+**Parameters**
+
+**type**:  *Type*,  TypeCheck if value is not null or undefined
+
+**Returns**
+
+*Boolean|String*,  ok True if the check is successfull, or an error string
+
+DuckType(name, typedef)
+-----------------------
+Create a DuckType type check. First argument is optional, and may be
+swapped with the second when omitted. The type parameter must be a plain
+object of key => type values, where the `Type` values will be wrapped as
+valid Wolperting types when needed.
+
+Examples:
+
+```javascript
+var type = Types.DuckType({ name: String, age: Number });
+
+console.log( type({ name: 'Hans', age: 89 }) );
+// returns true
+
+console.log( type({ name: 90, age: 'Hans' }) );
+// returns an error string
+
+```
+
+
+**Parameters**
+
+**name**:  *String*,  Optional name for this DuckType to identify it with
+
+**typedef**:  *Object*,  Plain object of name => Type pairs
+
+**Returns**
+
+*Boolean|String*,  ok True if the check is successfull, or an error string
+
 RegExp(values)
 --------------
 Create a RegExp type check. The first argument to this function must be a
