@@ -1,6 +1,6 @@
 {
     "name": "class-wolperting",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "description": "Post-modern oriented objects in Javascript",
     "main": "./index.js",
     "repository": {
@@ -33,5 +33,5 @@
     "author": "Matthijs van Henten",
     "license": "BSD",
     "readmeFilename": "README.md",
-    "gitHead": "823e49a1e5cbb97afb05c21c7cafe582cb02754c"
+    "gitHead": "a74123f1f96f5ef598b70df6213502b08ee4e39a"
 }
