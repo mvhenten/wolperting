@@ -7,6 +7,19 @@ var assert = require('assert'),
 
 
 suite('Wolperting constructors and tests', function() {
+    test('REGRESSION: getters must not be triggerd in create', function() {
+        var Thing = Wolperting.create({
+            get cantouchthis() {
+                throw new Error('Can\'t touch this');
+            }
+        });
+
+        assert.throws(function() {
+            var me = new Thing();
+            return me.cantouchthis;
+        }, /Can't touch this/);
+    });
+
     var Point = Wolperting.create({
         x: Number,
         y: Number
